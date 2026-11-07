@@ -1,0 +1,47 @@
+
+---
+- name: Automatizar configuracion de servidores Ubuntu
+  hosts: servidores
+  become: yes
+
+  tasks:
+
+    - name: Actualizar cache de APT
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Crear usuario itla
+      user:
+        name: itla
+        state: present
+        create_home: yes
+        shell: /bin/bash
+
+    - name: Crear carpeta app
+      file:
+        path: /home/itla/app
+        state: directory
+        owner: itla
+        group: itla
+        mode: '0755'
+
+    - name: Crear archivo hola.txt
+      copy:
+        content: "Hola desde Ansible!"
+        dest: /home/itla/app/hola.txt
+        owner: itla
+        group: itla
+        mode: '0644'
+
+    - name: Instalar cowsay y htop
+      apt:
+        name:
+          - cowsay
+          - htop
+        state: present
+        update_cache: no
+
+    - name: Mostrar mensaje de finalizacion
+      debug:
+        msg: "Servidor configurado correctamente"
